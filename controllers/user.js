@@ -3,7 +3,7 @@ const uuid = require('uuid').v4
 
 async function getUser(req, res) {
 	try {
-		const { authToken } = req.body
+		const { authorization: authToken } = req.headers
 
 		if (!authToken) {
 			res.status(400).json({ error: 'Auth token required' })
@@ -99,16 +99,39 @@ async function signUp(req, res) {
 		let authExpiry = new Date()
 		authExpiry.setMinutes(authExpiry.getMinutes() + parseInt(process.env.AUTH_EXPIRY_MINUTES))
 
-		let res = await req.db.query(
+		let result = await req.db.query(
 			`INSERT INTO users (name, email, password_hash, salt, auth_token, auth_expiry) 
            VALUES ("${name}", "${email}", "${passwordHash}", "",  "${authToken}", "${authExpiry.toJSON()}");`
 		)
 
-		res.json({ userId: res.insertId, name, email, authToken, authExpiry })
+		res.json({ userId: result.insertId, name, email, authToken, authExpiry })
 	} catch (err) {
 		console.error(err)
 		res.sendStatus(500)
 	}
 }
 
-module.exports = { getUser, signIn, signOut, signUp }
+async function getUserSpotDetails(req, res) {
+	try {
+		const { spotId } = req.query
+		const { user_id } = req.user
+
+		const result = {
+			favourite: false,
+			wantToGo: false,
+		}
+
+		let rows = await req.db.query(`SELECT * FROM fav_spots WHERE user_id=${user_id} AND spot_id=${spotId};`)
+		if (rows.length > 0) result.favourite = true
+
+		rows = await req.db.query(`SELECT * FROM wtg_spots WHERE user_id=${user_id} AND spot_id=${spotId};`)
+		if (rows.length > 0) result.wantToGo = true
+
+		res.json(result)
+	} catch (err) {
+		console.error(err)
+		res.sendStatus(500)
+	}
+}
+
+module.exports = { getUser, signIn, signOut, signUp, getUserSpotDetails }

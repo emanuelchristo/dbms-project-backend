@@ -4,7 +4,7 @@ const cors = require('cors')
 const mysql = require('promise-mysql')
 
 const { checkAuth } = require('./middlewares/auth')
-const { getUser, signIn, signOut, signUp } = require('./controllers/user')
+const { getUser, signIn, signOut, signUp, getUserSpotDetails } = require('./controllers/user')
 const { search } = require('./controllers/search')
 const { recommended } = require('./controllers/recommended')
 const { category } = require('./controllers/category')
@@ -33,10 +33,11 @@ async function main() {
 	// ROUTES
 
 	// User
-	app.post('/get-user', checkAuth, getUser)
+	app.get('/get-user', checkAuth, getUser)
 	app.post('/sign-in', signIn)
 	app.post('/sign-out', checkAuth, signOut)
 	app.post('/sign-up', signUp)
+	app.get('/user-spot-details', checkAuth, getUserSpotDetails)
 
 	// Landing page
 	app.post('/search', search)
