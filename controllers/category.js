@@ -5,7 +5,6 @@ async function category(req, res) {
 		location.longitude = Number(location.longitude)
 		page = parseInt(page)
 
-		console.log({ sort, location, page, type })
 		let query = `SELECT * FROM spots WHERE type='${type}';`
 
 		if (sort == 'nearest')

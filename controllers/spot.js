@@ -1,3 +1,5 @@
+const NEARBY_DISTANCE_THRESHOLD = 20000
+
 async function spot(req, res) {
 	try {
 		const { spotId } = req.query
@@ -39,6 +41,12 @@ async function spot(req, res) {
 
 		// Adding reviews to spot
 		spot.reviews = reviews
+
+		// Nearby spots
+		rows = await req.db.query(
+			`SELECT * FROM spots WHERE spot_id <> ${spotId} AND ST_Distance_Sphere(point(${spot.longitude}, ${spot.latitude}), point(spots.longitude,spots.latitude)) < ${NEARBY_DISTANCE_THRESHOLD} ORDER BY ST_Distance_Sphere(point(${spot.longitude}, ${spot.latitude}), point(spots.longitude,spots.latitude)) LIMIT 10;`
+		)
+		spot.nearBySpots = rows
 
 		res.json(spot)
 	} catch (err) {
