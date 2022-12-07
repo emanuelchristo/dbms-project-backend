@@ -30,24 +30,29 @@ CREATE TABLE spots (
   spot_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name VARCHAR(30) NOT NULL,
   type ENUM ('place', 'restaurant', 'movie', 'hotel') NOT NULL,
-  rating FLOAT,
   location_link VARCHAR(100) NOT NULL,
   city VARCHAR(30) NOT NULL,
-  description VARCHAR(512) NOT NULL,
+  description VARCHAR(550) NOT NULL,
   latitude FLOAT(25) NOT NULL,
   longitude FLOAT(25) NOT NULL,
+  user_rating FLOAT,
   google_rating FLOAT NOT NULL,
-  thumbnail VARCHAR(100)
+  thumbnail VARCHAR(100),
 );
 
 /* images TABLE */
 CREATE TABLE images(
   file_name VARCHAR(100) PRIMARY KEY,
-  place_id INT,
-  FOREIGN KEY (place_id) REFERENCES spots(spot_id) ON DELETE
+  spot_id INT,
+  FOREIGN KEY (spot_id) REFERENCES spots(spot_id) ON DELETE
   SET
     NULL
 );
+
+ALTER TABLE
+  spots
+ADD
+  FOREIGN KEY (thumbnail) REFERENCES images(file_name);
 
 /* fav_place spots TABLE*/
 CREATE TABLE fav_spots(
@@ -69,7 +74,7 @@ CREATE TABLE wtg_spots(
 
 /* spots reviews TABLE*/
 CREATE TABLE reviews(
-  rev_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  review_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   spot_id INT NOT NULL,
   user_id INT NOT NULL,
   description VARCHAR(120),

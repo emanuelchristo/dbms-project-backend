@@ -9,16 +9,16 @@ const { search } = require('./controllers/search')
 const { recommended } = require('./controllers/recommended')
 const { category } = require('./controllers/category')
 const { favourites, wantToGo } = require('./controllers/collections')
-const { spot, submitReview, markFavourite, markWantToGo } = require('./controllers/spot')
+const { spot, submitReview, editReview, markFavourite, markWantToGo, deleteReview } = require('./controllers/spot')
 const { submitFeedback } = require('./controllers/feedback')
 
 async function main() {
 	const app = express()
 
 	const db = await mysql.createConnection({
-		host: 'localhost',
+		host: '20.219.24.151',
 		user: 'root',
-		password: 'password',
+		password: 'Password@123',
 		database: 'letsgo',
 	})
 
@@ -55,6 +55,8 @@ async function main() {
 	app.post('/mark-favourite', checkAuth, markFavourite)
 	app.post('/mark-want-to-go', checkAuth, markWantToGo)
 	app.post('/submit-review', checkAuth, submitReview)
+	app.post('/edit-review', checkAuth, editReview)
+	app.post('/delete-review', checkAuth, deleteReview)
 
 	// Feedback page
 	app.post('/submit-feedback', checkAuth, submitFeedback)

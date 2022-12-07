@@ -1,7 +1,7 @@
 async function favourites(req, res) {
 	try {
 		const { authorization: authToken } = req.headers
-		let { type, sort, currPage } = req.query
+		let { type, currPage } = req.query
 		currPage = parseInt(currPage)
 		if (type == 'all') type = '%'
 
@@ -22,7 +22,7 @@ async function favourites(req, res) {
 async function wantToGo(req, res) {
 	try {
 		const { authorization: authToken } = req.headers
-		let { type, sort, currPage } = req.query
+		let { type, currPage } = req.query
 		currPage = parseInt(currPage)
 		if (type == 'all') type = '%'
 
