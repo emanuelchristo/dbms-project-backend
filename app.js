@@ -57,38 +57,38 @@ async function main() {
 	})
 
 	// User
-	app.get('/get-user', checkAuth, getUser)
-	app.post('/sign-in', signIn)
-	app.post('/sign-out', checkAuth, signOut)
-	app.post('/sign-up', signUp)
-	app.get('/user-spot-details', checkAuth, getUserSpotDetails)
-	app.post('/edit-name', checkAuth, editName)
-	app.get('/get-profile', checkAuth, getProfile)
-	app.post('/delete-account', checkAuth, deleteAccount)
+	app.get('/api/get-user', checkAuth, getUser)
+	app.post('/api/sign-in', signIn)
+	app.post('/api/sign-out', checkAuth, signOut)
+	app.post('/api/sign-up', signUp)
+	app.get('/api/user-spot-details', checkAuth, getUserSpotDetails)
+	app.post('/api/edit-name', checkAuth, editName)
+	app.get('/api/get-profile', checkAuth, getProfile)
+	app.post('/api/delete-account', checkAuth, deleteAccount)
 
-	app.get('/get-location-name', getLocationName)
+	app.get('/api/get-location-name', getLocationName)
 
 	// Landing page
-	app.post('/search', search)
-	app.post('/recommended', recommended)
+	app.post('/api/search', search)
+	app.post('/api/recommended', recommended)
 
 	// Category pages
-	app.get('/category', category)
+	app.get('/api/category', category)
 
 	// Collections
-	app.get('/favourites', checkAuth, favourites)
-	app.get('/want-to-go', checkAuth, wantToGo)
+	app.get('/api/favourites', checkAuth, favourites)
+	app.get('/api/want-to-go', checkAuth, wantToGo)
 
 	// Spot page
-	app.get('/spot', spot)
-	app.post('/mark-favourite', checkAuth, markFavourite)
-	app.post('/mark-want-to-go', checkAuth, markWantToGo)
-	app.post('/submit-review', checkAuth, submitReview)
-	app.post('/edit-review', checkAuth, editReview)
-	app.post('/delete-review', checkAuth, deleteReview)
+	app.get('/api/spot', spot)
+	app.post('/api/mark-favourite', checkAuth, markFavourite)
+	app.post('/api/mark-want-to-go', checkAuth, markWantToGo)
+	app.post('/api/submit-review', checkAuth, submitReview)
+	app.post('/api/edit-review', checkAuth, editReview)
+	app.post('/api/delete-review', checkAuth, deleteReview)
 
 	// Feedback page
-	app.post('/submit-feedback', submitFeedback)
+	app.post('/api/submit-feedback', submitFeedback)
 
 	const PORT = process.env.PORT || 5001
 	app.listen(PORT, () => console.log(`Listening on port ${PORT} ...`))
