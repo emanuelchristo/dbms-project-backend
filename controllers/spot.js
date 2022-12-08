@@ -1,3 +1,5 @@
+const { updateSpotRating } = require('../utils/spot-rating')
+
 const NEARBY_DISTANCE_THRESHOLD = 20000
 
 async function spot(req, res) {
@@ -15,6 +17,22 @@ async function spot(req, res) {
 		if (authToken) {
 			rows = await req.db.query(`SELECT * FROM users WHERE auth_token="${authToken}";`)
 			if (rows.length > 0) user = rows[0]
+		}
+
+		// Updating view count of user on this place
+		if (user) {
+			let temp = await req.db.query(`SELECT * FROM views WHERE spot_id=${spotId} AND user_id=${user.user_id};`)
+			let count = temp[0]?.view_count || 0
+			// If no entry yet
+			if (temp.length == 0) {
+				await req.db.query(
+					`INSERT INTO views (user_id, spot_id, view_count) VALUES (${user.user_id}, ${spotId}, 1);`
+				)
+			} else {
+				await req.db.query(
+					`UPDATE views SET view_count=${count + 1} WHERE user_id=${user.user_id} AND spot_id=${spotId};`
+				)
+			}
 		}
 
 		// Getting spot images
@@ -76,6 +94,8 @@ async function submitReview(req, res) {
 			`INSERT INTO reviews (spot_id, user_id, description, rating) VALUES (${spotId}, ${user_id}, "${review?.description}", ${review?.rating});`
 		)
 
+		await updateSpotRating({ db: req.db, spotId })
+
 		res.sendStatus(200)
 	} catch (err) {
 		console.error(err)
@@ -97,6 +117,11 @@ async function editReview(req, res) {
 			`UPDATE reviews SET description="${review?.description}", rating=${review?.rating} WHERE user_id=${user_id} AND review_id=${reviewId};`
 		)
 
+		let spotId = await req.db.query(`SELECT spot_id FROM reviews WHERE review_id=${reviewId};`)
+		spotId = spotId[0].spot_id
+
+		await updateSpotRating({ db: req.db, spotId })
+
 		res.sendStatus(200)
 	} catch (err) {
 		console.error(err)
@@ -114,7 +139,12 @@ async function deleteReview(req, res) {
 
 		const { user_id } = req.user
 
+		let spotId = await req.db.query(`SELECT spot_id FROM reviews WHERE review_id=${reviewId};`)
+		spotId = spotId[0].spot_id
+
 		await req.db.query(`DELETE FROM reviews WHERE review_id=${reviewId} AND user_id=${user_id};`)
+
+		await updateSpotRating({ db: req.db, spotId })
 
 		res.sendStatus(200)
 	} catch (err) {

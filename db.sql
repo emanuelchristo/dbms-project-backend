@@ -8,7 +8,7 @@ USE letsgo;
 /* user TABLE */
 CREATE TABLE users(
   user_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(20) NOT NULL,
   email VARCHAR(255) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   salt VARCHAR(255) NOT NULL,
@@ -16,13 +16,10 @@ CREATE TABLE users(
   auth_expiry VARCHAR(32)
 );
 
-/* website reviews TABLE */
-CREATE TABLE website_reviews(
-  rev_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  rating FLOAT NOT NULL,
-  description VARCHAR(255),
-  user_id INT NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+/* website feedback TABLE */
+CREATE TABLE feedback(
+  feedback_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  feedback VARCHAR(512)
 );
 
 /* spots TABLE */
@@ -37,7 +34,7 @@ CREATE TABLE spots (
   longitude FLOAT(25) NOT NULL,
   user_rating FLOAT,
   google_rating FLOAT NOT NULL,
-  thumbnail VARCHAR(100),
+  thumbnail VARCHAR(100)
 );
 
 /* images TABLE */
@@ -81,6 +78,15 @@ CREATE TABLE reviews(
   rating FLOAT NOT NULL,
   FOREIGN KEY (spot_id) REFERENCES spots(spot_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE views (
+  user_id INT NOT NULL,
+  spot_id INT NOT NULL,
+  view_count INT,
+  PRIMARY KEY(user_id, spot_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (spot_id) REFERENCES spots(spot_id) ON DELETE CASCADE
 );
 
 insert into

@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const { updateSpotRating } = require('../utils/spot-rating')
 const uuid = require('uuid').v4
 
 async function getUser(req, res) {
@@ -134,4 +135,69 @@ async function getUserSpotDetails(req, res) {
 	}
 }
 
-module.exports = { getUser, signIn, signOut, signUp, getUserSpotDetails }
+async function editName(req, res) {
+	try {
+		const { user_id } = req.user
+		const { name } = req.body
+
+		if (!name || name?.length < 3) {
+			res.status(400).json({ error: 'Name should be atleast 3 letters' })
+			return
+		}
+
+		await req.db.query(`UPDATE users SET name="${name}" WHERE user_id=${user_id};`)
+
+		res.sendStatus(200)
+	} catch (err) {
+		console.error(err)
+		res.sendStatus(500)
+	}
+}
+
+async function getProfile(req, res) {
+	try {
+		const { user_id } = req.user
+
+		let favCount = await req.db.query(`SELECT COUNT(*) AS favCount FROM fav_spots WHERE user_id=${user_id};`)
+		favCount = favCount[0]?.favCount
+
+		let wtgCount = await req.db.query(`SELECT COUNT(*) AS wtgCount FROM wtg_spots WHERE user_id=${user_id};`)
+		wtgCount = wtgCount[0]?.wtgCount
+
+		let revCount = await req.db.query(`SELECT COUNT(*) AS revCount FROM reviews WHERE user_id=${user_id};`)
+		revCount = revCount[0]?.revCount
+
+		let viewCount = await req.db.query(`SELECT SUM(view_count) AS viewCount FROM views WHERE user_id=${user_id};`)
+		viewCount = viewCount[0]?.viewCount || 0
+
+		res.json({
+			favourites: favCount,
+			wantToGo: wtgCount,
+			reviews: revCount,
+			views: viewCount,
+		})
+	} catch (err) {
+		console.error(err)
+		res.sendStatus(500)
+	}
+}
+
+async function deleteAccount(req, res) {
+	try {
+		const { user_id } = req.user
+
+		let userReviewedSpots = await req.db.query(`SELECT spot_id FROM reviews WHERE user_id=${user_id};`)
+		userReviewedSpots = userReviewedSpots.map((item) => item.spot_id)
+
+		await req.db.query(`DELETE FROM users WHERE user_id=${user_id};`)
+
+		userReviewedSpots.forEach(async (item) => await updateSpotRating({ db: req.db, spotId: item }))
+
+		res.sendStatus(200)
+	} catch (err) {
+		console.error(err)
+		res.sendStatus(500)
+	}
+}
+
+module.exports = { getUser, signIn, signOut, signUp, getUserSpotDetails, editName, getProfile, deleteAccount }

@@ -29,7 +29,7 @@ async function search(req, res) {
 		else if (sort == 'nearest')
 			dbquery = `SELECT * FROM spots WHERE type LIKE '${type}' AND ST_Distance_Sphere(point(${queryLocation.longitude}, ${queryLocation.latitude}), point(spots.longitude,spots.latitude)) < ${SEARCH_DISTANCE_THRESHOLD} ORDER BY ST_Distance_Sphere(point(${location.longitude}, ${location.latitude}), point(spots.longitude,spots.latitude));`
 		else if (sort == 'rating')
-			dbquery = `SELECT * FROM spots WHERE type LIKE '${type}' AND ST_Distance_Sphere(point(${queryLocation.longitude}, ${queryLocation.latitude}), point(spots.longitude,spots.latitude)) < ${SEARCH_DISTANCE_THRESHOLD} ORDER BY (0.5*google_rating + 0.5*IF(user_rating, user_rating, google_rating)) DESC;`
+			dbquery = `SELECT * FROM spots WHERE type LIKE '${type}' AND ST_Distance_Sphere(point(${queryLocation.longitude}, ${queryLocation.latitude}), point(spots.longitude,spots.latitude)) < ${SEARCH_DISTANCE_THRESHOLD} ORDER BY (0.75*google_rating + 0.25*IF(user_rating, user_rating, google_rating)) DESC;`
 
 		let count = await req.db.query(
 			`SELECT COUNT(*) AS totalResults FROM spots WHERE type LIKE '${type}' AND ST_Distance_Sphere(point(${queryLocation.longitude}, ${queryLocation.latitude}), point(spots.longitude,spots.latitude)) < ${SEARCH_DISTANCE_THRESHOLD};`
