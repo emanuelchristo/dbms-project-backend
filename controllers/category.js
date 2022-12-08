@@ -1,6 +1,5 @@
 async function category(req, res) {
 	try {
-		console.log('here')
 		let { sort, location, page, type } = req.query
 		location.latitude = Number(location.latitude)
 		location.longitude = Number(location.longitude)
