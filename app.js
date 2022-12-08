@@ -52,6 +52,10 @@ async function main() {
 
 	// ROUTES
 
+	app.get('/', (req, res) => {
+		res.send('Hello world')
+	})
+
 	// User
 	app.get('/get-user', checkAuth, getUser)
 	app.post('/sign-in', signIn)
